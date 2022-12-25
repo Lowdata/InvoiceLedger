@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CONNECTION TO METAMASK</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <style>
+        body {
+            background-color: palevioletred;
+            font-size: 33px;
+            text-align: center;
+        }
+        button {
+            background-color: aquamarine;
+            font-size: 33px;
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        }
+        button:hover {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+          <label for="InvoiceCount">InvoiceCount</label>
+          <input type="text" id="InvoiceCount"></br>
+          <label for="Buyer-Pan">Buyer-Pan</label>
+          <input type="text" id="Buyer-Pan"></br>
+          <label for="Seller-Pan">Seller-Pan</label> 
+          <input type="text" id="Seller-Pan"> </br>
+          <label for="Amount">Amount</label>
+          <input type="text" id="Amount"> </br>
+          <label for="Date">Date</label>
+          <input type="text" id="Date"></br> 
+          <label for="PaymentStatus">PaymentStatus</label>
+          <input type="text" id="PaymentStatus"></br>
+	<button onclick="connectMetamask()">CONNECT TO METAMASK</button> <br>
+	<p id="accountArea"></p>
+	<button onclick="connectContract()">CONNECT TO CONTRACT</button> <br>
+	<p id="contractArea"></p>
+    <button onclick=" createInvoice()">createInvoice</button> <br>
+	<p id="dataArea1"></p>
+    <button onclick=" setInvoicePayStatus()">setInvoicePayStatus</button> <br>
+	<p id="dataArea2"></p>
+    <button onclick=" getInvoiceById()">getInvoiceById</button> <br>
+	<p id="dataArea3"></p>
+    <button onclick=" getInvoiceByBuyerPan()">getInvoiceByBuyerPan</button> <br>
+	<p id="dataArea4"></p>
+    
+
+
+    <script>
+        //1- connect metamask
+        
+        let account;
+        const connectMetamask = async () => {
+            if(window.ethereum !== "undefined") {
+                const accounts = await ethereum.request({method: "eth_requestAccounts"});
+                account = accounts[0];
+                document.getElementById("accountArea").innerHTML = account;
+            }
+        }
+
+
+        //2- connect to smart contract
+        const connectContract = async () => {
+            const ABI =  [{
+      "inputs": [],
+      "name": "c",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "invoiceCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_buyerPan",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_sellerPan",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_invoiceAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_invoiceDate",
+          "type": "uint256"
+        }
+      ],
+      "name": "createInvoice",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_invoiceId",
+          "type": "uint256"
+        }
+      ],
+      "name": "setInvoicePayStatus",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_invoiceId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getInvoiceById",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_buyerPan",
+          "type": "uint256"
+        }
+      ],
+      "name": "getInvoiceByBuyerPan",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    }
+   
+  ]
+            const Address = "0xF763F7613c43181e086a717Dd08b492c4b01137";
+            window.web3 = await new Web3(window.ethereum);
+            window.contract = await new window.web3.eth.Contract( ABI, Address); 
+            document.getElementById("contractArea").innerHTML = "connected to smart contract";
+        }
+
+        //3-Interact with data from smart contract
+        
+        const createInvoice = async () => {
+            const data = await window.contract.methods.createInvoice().call();
+            document.getElementById("dataArea1").innerHTML = data;
+        }
+        const setInvoicePayStatus = async () => {
+            const data = await window.contract.methods.setInvoicePayStatus().call();
+            document.getElementById("dataArea2").innerHTML = data;
+        } 
+        const getInvoiceById = async () => {
+            const data = await window.contract.methods.getInvoiceById().call();
+            document.getElementById("dataArea3").innerHTML = data;
+        } 
+        const getInvoiceByBuyerPan = async () => {
+            const data = await window.contract.methods.getInvoiceByBuyerPan().call();
+            document.getElementById("dataArea4").innerHTML = data;
+        }
+    </script>
+</body>
+
+</html>
